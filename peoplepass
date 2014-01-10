@@ -1,0 +1,41 @@
+#!/bin/bash
+
+## Random Personal Password generator.
+## Inspired by www.passweird.com
+## Dodgy bash script by WuX 2014-01-08
+
+# LOOP for multiple phrases begin;
+
+for run in {1..20}
+do
+
+	# 2 Numbers chosen to pick a random word from dictionary
+	WORDNUMBER=($RANDOM * $RANDOM)
+	WORDNUMBER2=($RANDOM * $RANDOM)
+
+	# Get how many words are in dict/
+	LISTNUMBER=$(wc -w /usr/share/dict/words | cut  -c1-5)
+
+	# Modulo those two variables to make 2 constrained random numbers
+	MAGICNUMBER=$(($WORDNUMBER % $LISTNUMBER))
+	MAGICNUMBER2=$(($WORDNUMBER2 % $LISTNUMBER))
+
+	# Get a random word with 'p' appended so sed doesnt add a newline, sed any damn " 's " off of the word.
+	RNDWORD=$(sed -n $MAGICNUMBER"p" /usr/share/dict/words | sed s/\'s//)
+	RNDWORD2=$(sed -n $MAGICNUMBER2"p" /usr/share/dict/words | sed s/\'s//)
+
+	# make a 2 digit random number
+	RND=($RANDOM / $RANDOM)
+	RND=$(echo $RND | cut -c 1-2)
+
+	# Add them together, spilt with a hypen, with a short random number appended
+	PASS="$RNDWORD"-"$RNDWORD2""$RND"
+
+	# Lighty L33t it
+	echo $PASS | tr [ieos] [1305]
+
+# end output loop
+done
+
+
+
