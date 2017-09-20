@@ -8,6 +8,9 @@
 
 for run in {1..20}
 do
+	 #pick random special char
+        chars='@&_+=!'
+        SPEC=$(echo ${chars:$((RANDOM % ${#chars})):1})
 
 	# 2 Numbers chosen to pick a random word from dictionary
 	WORDNUMBER=($RANDOM * $RANDOM)
@@ -28,8 +31,8 @@ do
 	RND=($RANDOM / $RANDOM)
 	RND=$(echo $RND | cut -c 1-2)
 
-	# Add them together, spilt with a hypen, with a short random number appended
-	PASS="$RNDWORD"-"$RNDWORD2""$RND"
+	# Add them together, spilt with a special char, with a short random number appended
+	PASS="$RNDWORD""SEPC""$RNDWORD2""$RND"
 
 	# Lighty L33t it
 	echo $PASS | tr [ieos] [1305]
