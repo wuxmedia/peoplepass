@@ -3,40 +3,107 @@
 ## Random Personal Password generator.
 ## Inspired by www.passweird.com
 ## Dodgy bash script by WuX 2014-01-08
+## Added getopts support by nicks 2019-10-16
+
+# n = number of generated passwords
+# m = number of random words used to form password
+# z = yes, confuse letters with numbers
+# s = yes, special characters
+# r = yes, two digit random number
+NPASS=20
+NGEN=2
+CONFUSE=true 
+SPECIAL=true
+USERRAND=true
+while getopts n:m:zsr opt; do
+
+    case $opt in
+# n = number of passwords to generate
+	n)
+	    NPASS=$OPTARG
+	    echo "argument -n called with $OPTARG" >&2
+	    ;;
+# m = number of words used in password
+	m)
+	    NGEN=$OPTARG
+	    echo "argument -m called with $OPTARG" >&2
+	    ;;
+# z = yes, confuse letters with numbers
+	z)
+	    CONFUSE=false
+	    echo "argument -z" >&2
+	    ;;
+# s = yes, special characters
+	s)
+	    SPECIAL=false
+	    echo "argument -s" >&2
+	    ;;
+# r = yes, two digit random number
+	r)
+	    echo "argument -r" >&2
+	    USERRAND=false
+	    ;;
+        *)
+	    echo "error"
+	    ;;
+    esac
+done
+
+echo NPASS=$NPASS NGEN=$NGEN CONFUSE=$CONFUSE SPECIAL=$SPECIAL USERRAND=$USERRAND
 
 # LOOP for multiple phrases begin;
-
-for run in {1..20}
+#for run in {1..20}
+for run in  $(seq 1 $NPASS)
 do
+        PASS=""
+
 	 #pick random special char
         chars='@&_+=!'
-        SPEC=$(echo ${chars:$((RANDOM % ${#chars})):1})
-
-	# 2 Numbers chosen to pick a random word from dictionary
-	WORDNUMBER=($RANDOM * $RANDOM)
-	WORDNUMBER2=($RANDOM * $RANDOM)
-
+	if [ "$SPECIAL" = true ]
+        then SPEC=$(echo ${chars:$((RANDOM % ${#chars})):1})
+        else SPEC=""
+	fi
+	
+	    
 	# Get how many words are in dict/
 	LISTNUMBER=$(wc -w /usr/share/dict/words | cut  -c1-5)
 
+	for i in  $(seq 1 $NGEN)
+	do 
+	# 2 Numbers chosen to pick a random word from dictionary
+	WORDNUMBER=($RANDOM * $RANDOM)
+
 	# Modulo those two variables to make 2 constrained random numbers
-	MAGICNUMBER=$(($WORDNUMBER % $LISTNUMBER))
-	MAGICNUMBER2=$(($WORDNUMBER2 % $LISTNUMBER))
+	MAGICNUMBER=$((${WORDNUMBER} % $LISTNUMBER))
 
 	# Get a random word with 'p' appended so sed doesnt add a newline, sed any damn " 's " off of the word.
 	RNDWORD=$(sed -n $MAGICNUMBER"p" /usr/share/dict/words | sed s/\'s//)
-	RNDWORD2=$(sed -n $MAGICNUMBER2"p" /usr/share/dict/words | sed s/\'s//)
 
 	# make a 2 digit random number
-	RND=($RANDOM / $RANDOM)
-	RND=$(echo $RND | cut -c 1-2)
+	if [ "$USERRAND" = true ] 
+	then 
+	    RND=($RANDOM / $RANDOM)
+	    RND=$(echo $RND | cut -c 1-2)
+        else
+	    RND=""
+	fi
 
 	# Add them together, spilt with a special char, with a short random number appended
-	PASS="$RNDWORD""$SPEC""$RNDWORD2""$RND"
+	PASS="$RNDWORD"$SPEC$PASS
+	
+	done
 
+	# PASS="$RNDWORD""$SPEC""$RNDWORD2""$RND"
+	if [ $USERRAND = true ]
+	then PASS="$PASS"$RND
+        fi
+
+	if [ $CONFUSE = true ]
 	# Lighty L33t it
-	echo $PASS | tr [ieos] [1305]
-
+	then echo $PASS | tr [ieos] [1305]
+	else echo $PASS
+	fi
+		 
 # end output loop
 done
 
