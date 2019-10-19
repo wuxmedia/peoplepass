@@ -4,18 +4,21 @@
 ## Inspired by www.passweird.com
 ## Dodgy bash script by WuX 2014-01-08
 ## Added getopts support by nicks 2019-10-16
+## Added filename override midsummer-night-dream
 
 # n = number of generated passwords
 # m = number of random words used to form password
 # z = yes, confuse letters with numbers
 # s = yes, special characters
 # r = yes, two digit random number
+# f = filename, override default dictionary
 NPASS=20
 NGEN=2
 CONFUSE=true 
 SPECIAL=true
 USERRAND=true
-while getopts n:m:zsr opt; do
+FILENAME="/usr/share/dict/words"
+while getopts n:m:f:zsr opt; do
 
     case $opt in
 # n = number of passwords to generate
@@ -43,6 +46,11 @@ while getopts n:m:zsr opt; do
 	    echo "argument -r" >&2
 	    USERRAND=false
 	    ;;
+# f  override filename
+	f)
+	    echo "new dictionary= $OPTARG" >&2
+	    FILENAME=$OPTARG
+	    ;;
         *)
 	    echo "error"
 	    ;;
@@ -66,7 +74,7 @@ do
 	
 	    
 	# Get how many words are in dict/
-	LISTNUMBER=$(wc -w /usr/share/dict/words | cut  -c1-5)
+	LISTNUMBER=$(wc -w $FILENAME | cut  -c1-5)
 
 	for i in  $(seq 1 $NGEN)
 	do 
@@ -77,7 +85,7 @@ do
 	MAGICNUMBER=$((${WORDNUMBER} % $LISTNUMBER))
 
 	# Get a random word with 'p' appended so sed doesnt add a newline, sed any damn " 's " off of the word.
-	RNDWORD=$(sed -n $MAGICNUMBER"p" /usr/share/dict/words | sed s/\'s//)
+	RNDWORD=$(sed -n $MAGICNUMBER"p" $FILENAME | sed s/\'s//)
 
 	# make a 2 digit random number
 	if [ "$USERRAND" = true ] 
