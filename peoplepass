@@ -74,7 +74,7 @@ do
 	
 	    
 	# Get how many words are in dict/
-	LISTNUMBER=$(wc -w $FILENAME | cut  -c1-5)
+        LISTNUMBER=$(wc -l $FILENAME | awk 'BEGIN {FS=" "}{print $1}')
 
 	for i in  $(seq 1 $NGEN)
 	do 
