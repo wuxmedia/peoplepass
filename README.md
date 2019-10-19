@@ -9,3 +9,4 @@ m = number of random words used to form password
 z = yes, confuse letters with numbers
 s = yes, special characters
 r = yes, two digit random number
+f = override dictionary with filename
